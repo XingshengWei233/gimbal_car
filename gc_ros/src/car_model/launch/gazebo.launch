@@ -1,0 +1,31 @@
+<launch>
+  <include
+    file="$(find gazebo_ros)/launch/empty_world.launch" />
+
+  <node
+    name="spawn_model"
+    pkg="gazebo_ros"
+    type="spawn_model"
+    args="-file $(find car_model)/urdf/car_model.xacro -urdf -model car_model"
+    output="screen" />
+
+  <rosparam file="$(find car_model)/config/control_config.yaml" command="load"/>
+
+  <node 
+    name="controller_spawner" 
+    pkg="controller_manager" 
+    type="spawner" 
+    respawn="false"
+    output="screen" 
+    ns="/car_model" 
+    args="joint_state_controller w1_v_controller w4_v_controller yaw_controller"/>
+
+
+  <node 
+    name="robot_state_publisher" 
+    pkg="robot_state_publisher" 
+    type="robot_state_publisher"
+    respawn="true" output="screen">
+    <remap from="/joint_states" to="/car_model/joint_states" />
+  </node>
+</launch>
